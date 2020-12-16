@@ -41,7 +41,6 @@ import (
 	"github.com/m3db/m3/src/metrics/metric/unaggregated"
 	"github.com/m3db/m3/src/metrics/policy"
 	"github.com/m3db/m3/src/x/clock"
-	xerrors "github.com/m3db/m3/src/x/errors"
 	"github.com/m3db/m3/src/x/instrument"
 
 	"github.com/uber-go/tally"
@@ -827,11 +826,9 @@ func newAggregatorAddTimedMetrics(
 
 func (m *aggregatorAddTimedMetrics) ReportError(err error) {
 	switch {
-	case err == errTooFarInTheFuture ||
-		xerrors.InnerError(err) == errTooFarInTheFuture:
+	case errors.Is(err, errTooFarInTheFuture):
 		m.tooFarInTheFuture.Inc(1)
-	case err == errTooFarInThePast ||
-		xerrors.InnerError(err) == errTooFarInThePast:
+	case errors.Is(err, errTooFarInThePast):
 		m.tooFarInThePast.Inc(1)
 	default:
 		m.aggregatorAddMetricMetrics.ReportError(err)

@@ -20,7 +20,11 @@
 
 package limits
 
-import xerrors "github.com/m3db/m3/src/x/errors"
+import (
+	"errors"
+
+	xerrors "github.com/m3db/m3/src/x/errors"
+)
 
 type queryLimitExceededError struct {
 	msg string
@@ -39,19 +43,19 @@ func (err *queryLimitExceededError) Error() string {
 
 // IsQueryLimitExceededError returns true if the error is a query limits exceeded error.
 func IsQueryLimitExceededError(err error) bool {
-	//nolint:errorlint
-	for err != nil {
-		if _, ok := err.(*queryLimitExceededError); ok {
-			return true
-		}
-		if multiErr, ok := err.(xerrors.MultiError); ok {
-			for _, e := range multiErr.Errors() {
-				if IsQueryLimitExceededError(e) {
-					return true
-				}
+	var exceededErr *queryLimitExceededError
+	if errors.As(err, &exceededErr) {
+		return true
+	}
+
+	var multiErr xerrors.MultiError
+	if errors.As(err, &multiErr) {
+		for _, e := range multiErr.Errors() {
+			if IsQueryLimitExceededError(e) {
+				return true
 			}
 		}
-		err = xerrors.InnerError(err)
 	}
+
 	return false
 }

@@ -21,6 +21,7 @@
 package namespace
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"path"
@@ -83,12 +84,12 @@ func (h *SchemaHandler) ServeHTTP(
 	opts := handleroptions.NewServiceOptions(svc, r.Header, nil)
 	resp, err := h.Add(md, opts)
 	if err != nil {
-		if err == kv.ErrNotFound || xerrors.InnerError(err) == kv.ErrNotFound {
+		if errors.Is(err, kv.ErrNotFound) {
 			logger.Error("namespaces metadata key does not exist", zap.Error(err))
 			xhttp.WriteError(w, err)
 			return
 		}
-		if err == kvadmin.ErrNamespaceNotFound || xerrors.InnerError(err) == kvadmin.ErrNamespaceNotFound {
+		if errors.Is(err, kvadmin.ErrNamespaceNotFound) {
 			logger.Error("namespace does not exist", zap.Error(err))
 			xhttp.WriteError(w, xhttp.NewError(err, http.StatusNotFound))
 			return
@@ -164,12 +165,12 @@ func (h *SchemaResetHandler) ServeHTTP(
 	opts := handleroptions.NewServiceOptions(svc, r.Header, nil)
 	resp, err := h.Reset(md, opts)
 	if err != nil {
-		if err == kv.ErrNotFound || xerrors.InnerError(err) == kv.ErrNotFound {
+		if errors.Is(err, kv.ErrNotFound) {
 			logger.Error("namespaces metadata key does not exist", zap.Error(err))
 			xhttp.WriteError(w, err)
 			return
 		}
-		if err == kvadmin.ErrNamespaceNotFound || xerrors.InnerError(err) == kvadmin.ErrNamespaceNotFound {
+		if errors.Is(err, kvadmin.ErrNamespaceNotFound) {
 			logger.Error("namespace does not exist", zap.Error(err))
 			xhttp.WriteError(w, xhttp.NewError(err, http.StatusNotFound))
 			return
