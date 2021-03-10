@@ -151,7 +151,6 @@ offlineSearch = false
   [[params.versions]]
     version = "1.0"
     url = ""
-
   [params.releases]
     docker = "v1.0.0"
 
