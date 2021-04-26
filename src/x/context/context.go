@@ -23,6 +23,9 @@ package context
 import (
 	stdctx "context"
 	"fmt"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
+	"os"
 	"sync"
 
 	xopentracing "github.com/m3db/m3/src/x/opentracing"
@@ -43,6 +46,9 @@ var (
 	noopTracer opentracing.NoopTracer
 
 	errSpanTooDeep = fmt.Errorf("span created exceeds maximum depth allowed (%d)", maxDistanceFromRootContext)
+	zapCore        = zapcore.NewCore(
+		zapcore.NewJSONEncoder(zap.NewProductionEncoderConfig()), os.Stdout, zap.InfoLevel)
+	zapLogger = zap.New(zapCore)
 )
 
 // NB(r): using golang.org/x/net/context is too GC expensive.
@@ -361,6 +367,7 @@ func (c *ctx) StartSampledTraceSpan(name string) (Context, opentracing.Span, boo
 	child.SetGoContext(childGoCtx)
 	if child.DistanceFromRootContext() == maxDistanceFromRootContext {
 		ext.LogError(span, errSpanTooDeep)
+		zapLogger.Warn("Too deep error reached. " + errSpanTooDeep.Error())
 	}
 	return child, span, true
 }
