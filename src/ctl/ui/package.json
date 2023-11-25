@@ -4,7 +4,7 @@
   "private": true,
   "proxy": "http://localhost:9000",
   "dependencies": {
-    "antd": "^2.12.5",
+    "antd": "^4.0.0",
     "axios": "^0.19.0",
     "basscss": "^8.0.3",
     "date-fns": "^1.29.0",
@@ -17,7 +17,7 @@
     "react-dom": "^15.6.1",
     "react-refetch": "^1.0.0",
     "react-router-dom": "^4.1.2",
-    "react-scripts": "1.0.10",
+    "react-scripts": "5.0.0",
     "recompose": "^0.24.0",
     "yup": "^0.22.0"
   },
